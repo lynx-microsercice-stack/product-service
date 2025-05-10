@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lynx.product_service.common.BaseResponse;
+import lynx.product_service.product.model.dto.ProductQuery;
 import lynx.product_service.product.model.dto.request.CreateProductRequest;
 import lynx.product_service.product.model.entity.ProductEntity;
-import lynx.product_service.product.service.ProductQuery;
 import lynx.product_service.product.service.ProductService;
 
 @RestController

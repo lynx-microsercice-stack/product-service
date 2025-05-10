@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lynx.product_service.exception.CustomNotFoundException;
 import lynx.product_service.product.mapper.ProductMapper;
+import lynx.product_service.product.model.dto.ProductQuery;
 import lynx.product_service.product.model.dto.request.CreateProductRequest;
 import lynx.product_service.product.model.entity.ProductEntity;
 import lynx.product_service.product.repos.elasticsearch.ProductESSearchRepoCustomImpl;

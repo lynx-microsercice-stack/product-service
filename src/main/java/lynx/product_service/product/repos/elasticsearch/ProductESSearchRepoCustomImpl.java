@@ -18,8 +18,8 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lynx.product_service.exception.GeneralException;
+import lynx.product_service.product.model.dto.ProductQuery;
 import lynx.product_service.product.model.entity.ProductEntity;
-import lynx.product_service.product.service.ProductQuery;
 
 @Repository
 @AllArgsConstructor

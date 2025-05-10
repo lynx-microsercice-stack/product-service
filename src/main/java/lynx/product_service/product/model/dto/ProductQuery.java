@@ -1,4 +1,4 @@
-package lynx.product_service.product.service;
+package lynx.product_service.product.model.dto;
 
 
 import lombok.Builder;

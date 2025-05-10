@@ -1,4 +1,4 @@
-package lynx.product.product_service;
+package lynx.product_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
