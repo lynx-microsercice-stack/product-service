@@ -1,0 +1,44 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="1" author="lynx">
+        <preConditions onFail="HALT">
+            <not>
+                <tableExists tableName="products"/>
+            </not>
+        </preConditions>
+        
+        <createTable tableName="products">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="price" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="VARCHAR(36)"/>
+            <column name="image_url" type="VARCHAR(255)"/>
+            <column name="brand" type="VARCHAR(100)"/>
+            <column name="color" type="VARCHAR(50)"/>
+            <column name="size" type="VARCHAR(50)"/>
+            <column name="material" type="VARCHAR(100)"/>
+            <column name="style" type="VARCHAR(100)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="lynx">
+        <preConditions onFail="HALT">
+            <and>
+                <tableExists tableName="products"/>
+                <columnExists tableName="products" columnName="price"/>
+            </and>
+        </preConditions>
+        <modifyDataType tableName="products" columnName="price" newDataType="DECIMAL(10,2)" />
+    </changeSet>
+</databaseChangeLog>

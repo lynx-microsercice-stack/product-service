@@ -1,0 +1,95 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /api/v1
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: product-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/master.xml
+    default-schema: public
+  elasticsearch:
+    uris: http://localhost:9200
+  data:
+    redis:
+      host: localhost
+      port: 6002
+api-gateway-credentials:
+  username: admin
+  password: admin
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+# Custom application properties
+app:
+  elasticsearch:
+    sync:
+      enabled: true
+      interval-ms: 3600000  # 1 hour in milliseconds
+      batch-size: 100
+logging:
+  level:
+    root: INFO
+    lynx.product_service: DEBUG
+    org.springframework.data.elasticsearch: DEBUG
+    org.elasticsearch: DEBUG
+    com.netflix.discovery: DEBUG
+    com.netflix.eureka: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+# Swagger UI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+    version: openapi_3_1
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    filter: true
+    doc-expansion: none
+    default-models-expand-depth: -1
+    default-model-expand-depth: 2
+    display-request-duration: true
+    syntax-highlight:
+      enabled: true
+      theme: monokai
+  show-actuator: true
+  packages-to-scan: lynx.*.controller
+  paths-to-match: /**
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: lynx.auth.controller
+  security:
+    enabled: true
+    basic:
+      enabled: false
+    oauth2:
+      enabled: true
+      flows:
+        password:
+          token-url: http://localhost:8088/realms/lynx-realm/protocol/openid-connect/token
+          scopes:
+            openid: OpenID Connect scope
+            profile: User profile scope
+            email: User email scope
