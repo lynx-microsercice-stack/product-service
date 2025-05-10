@@ -3,7 +3,6 @@ package lynx.product_service.product.service;
 
 import lombok.Builder;
 import lombok.Getter;
-import lynx.product_service.annotation.NotLessThan;
 import lynx.product_service.product.enums.SortType;
 import lynx.product_service.utils.JsonUtil;
 

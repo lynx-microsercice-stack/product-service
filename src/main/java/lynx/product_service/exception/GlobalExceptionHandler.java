@@ -1,6 +1,5 @@
 package lynx.product_service.exception;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import lombok.extern.slf4j.Slf4j;
 import lynx.product_service.common.ErrorResponse;
@@ -79,6 +79,16 @@ public class GlobalExceptionHandler {
         log.error("Unexpected error occurred: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.name())
+                .time(LocalDateTime.now())
+                .message(ex.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(CustomNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(CustomNotFoundException ex) {
+        log.error("Not found error occurred: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.toString())
                 .time(LocalDateTime.now())
                 .message(ex.getMessage())
                 .build());

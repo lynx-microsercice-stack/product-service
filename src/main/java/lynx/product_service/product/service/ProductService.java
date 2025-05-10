@@ -9,10 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lynx.product_service.exception.CustomNotFoundException;
 import lynx.product_service.product.mapper.ProductMapper;
 import lynx.product_service.product.model.dto.request.CreateProductRequest;
 import lynx.product_service.product.model.entity.ProductEntity;
-import lynx.product_service.product.repos.elasticsearch.ProductESSearchRepo;
 import lynx.product_service.product.repos.elasticsearch.ProductESSearchRepoCustomImpl;
 import lynx.product_service.product.repos.jpa.ProductJPARepo;
 
@@ -22,7 +22,6 @@ import lynx.product_service.product.repos.jpa.ProductJPARepo;
 public class ProductService {
 
     private final ProductJPARepo productRepository;
-    private final ProductESSearchRepo productESSearchRepository;
     private final ProductESSearchRepoCustomImpl productESSearchRepoCustom;
     private final ProductMapper productMapper;
     /**
@@ -71,10 +70,20 @@ public class ProductService {
      * @param request the request to create a product
      */
     @Transactional
-    public void createProduct(CreateProductRequest request) {
+    public ProductEntity createProduct(CreateProductRequest request) {
         ProductEntity product = request.toEntity(productMapper);
-        productRepository.save(product);
-        // productESSearchRepository.save(product);
+        return productRepository.save(product);
+    }
 
+    /**
+     * Delete a product by its ID
+     * 
+     * @param productId the ID of the product to delete
+     */
+    public void deleteProduct(String productId) {
+        if (!productRepository.existsById(productId)) {
+            throw new CustomNotFoundException("Product not found");
+        }
+        productRepository.deleteById(productId);
     }
 }

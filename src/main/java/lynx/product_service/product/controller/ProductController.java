@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,8 +30,8 @@ public class ProductController {
 
     @PostMapping("/create")
     public ResponseEntity<BaseResponse<String>> createProduct(@RequestBody CreateProductRequest request) {
-        productService.createProduct(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.created("Product created successfully"));
+        var savedProduct = productService.createProduct(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.created(savedProduct.getId()));
     }
 
     @GetMapping
@@ -42,7 +43,9 @@ public class ProductController {
             @RequestParam(required = false) String material,
             @RequestParam(required = false) String style,
             @RequestParam(required = false) String priceMin,
-            @RequestParam(required = false) String priceMax) {
+            @RequestParam(required = false) String priceMax,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer limit) {
 
         ProductQuery productQuery = ProductQuery.builder()
                 .categoryId(categoryId)
@@ -53,6 +56,8 @@ public class ProductController {
                 .style(style)
                 .priceMin(Optional.ofNullable(priceMin).map(Double::valueOf).orElse(null))
                 .priceMax(Optional.ofNullable(priceMax).map(Double::valueOf).orElse(null))
+                .page(page)
+                .limit(limit)
                 .build();
 
         List<ProductEntity> products = productService.getProductsWithQueryParams(productQuery);
@@ -76,5 +81,11 @@ public class ProductController {
         Optional<ProductEntity> product = productService.getProductById(productId);
         return product.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<BaseResponse<String>> deleteProduct(@PathVariable String productId) {
+        productService.deleteProduct(productId);
+        return ResponseEntity.ok(BaseResponse.success("Product deleted successfully"));
     }
 }

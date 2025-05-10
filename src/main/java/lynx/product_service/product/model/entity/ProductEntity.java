@@ -3,6 +3,7 @@ package lynx.product_service.product.model.entity;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +17,7 @@ import lombok.Setter;
 
 
 @Entity
-@Document(indexName = "products")
+@Document(indexName = "product_db.public.products")
 @Table(name = "products")
 @Getter
 @Setter
@@ -31,7 +32,9 @@ public class ProductEntity {
     private String name;
     private String description;
     private Double price;
+    @JsonProperty("category_id")
     private String categoryId;
+    @JsonProperty("image_url")
     private String imageUrl;
     private String brand;
     private String color;

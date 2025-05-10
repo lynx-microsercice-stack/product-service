@@ -26,32 +26,16 @@ import lynx.product_service.product.service.ProductQuery;
 @Slf4j
 public class ProductESSearchRepoCustomImpl implements ProductESSearchRepoCustom {
 
-    private static final String PRODUCTS_INDEX = "products";
-    private static final int MAX_RESULTS = 1000;
-    
+    private static final String PRODUCTS_INDEX = "product_db.public.products";
+
     private final ElasticsearchClient elasticsearchClient;
 
-    @Override
-    public List<ProductEntity> search(ProductQuery queryParams) {
-        try {
-            Query query = createSearchQuery(queryParams);
-            SearchRequest searchRequest = createSearchRequest(query);
-            SearchResponse<ProductEntity> response = elasticsearchClient.search(searchRequest, ProductEntity.class);
-
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error executing Elasticsearch query", e);
-            throw new GeneralException(e.getMessage());
-        }
-    }
-
-    private SearchRequest createSearchRequest(Query query) {
+    private SearchRequest createSearchRequest(Query query, int page, int limit) {
         return SearchRequest.of(s -> s
                 .index(PRODUCTS_INDEX)
                 .query(query)
-                .size(MAX_RESULTS));
+                .from(page * limit)
+                .size(limit));
     }
 
     /**
@@ -65,13 +49,12 @@ public class ProductESSearchRepoCustomImpl implements ProductESSearchRepoCustom 
 
         // Map of field names to their values from queryParams
         Map<String, Function<ProductQuery, String>> termQueries = Map.of(
-            "categoryId", ProductQuery::getCategoryId,
-            "brand", ProductQuery::getBrand,
-            "color", ProductQuery::getColor,
-            "size", ProductQuery::getSize,
-            "material", ProductQuery::getMaterial,
-            "style", ProductQuery::getStyle
-        );
+                "categoryId", ProductQuery::getCategoryId,
+                "brand", ProductQuery::getBrand,
+                "color", ProductQuery::getColor,
+                "size", ProductQuery::getSize,
+                "material", ProductQuery::getMaterial,
+                "style", ProductQuery::getStyle);
 
         // Add term queries for non-null and non-empty fields
         termQueries.forEach((field, getter) -> {
@@ -85,6 +68,9 @@ public class ProductESSearchRepoCustomImpl implements ProductESSearchRepoCustom 
         if (queryParams.getPriceMin() != null || queryParams.getPriceMax() != null) {
             boolQueryBuilder.must(createPriceRangeQuery(queryParams));
         }
+
+        // add ignore deleted products
+        boolQueryBuilder.must(createTermQuery("__deleted", "false"));
 
         return Query.of(q -> q.bool(boolQueryBuilder.build()));
     }
@@ -112,5 +98,21 @@ public class ProductESSearchRepoCustomImpl implements ProductESSearchRepoCustom 
                 .lte(Optional.ofNullable(queryParams.getPriceMax()).orElse(999999999.0))));
 
         return Query.of(q -> q.range(rangeQuery));
+    }
+
+    @Override
+    public List<ProductEntity> search(ProductQuery queryParams) {
+        try {
+            Query query = createSearchQuery(queryParams);
+            SearchRequest searchRequest = createSearchRequest(query, queryParams.getPage(), queryParams.getLimit());
+            SearchResponse<ProductEntity> response = elasticsearchClient.search(searchRequest, ProductEntity.class);
+
+            return response.hits().hits().stream()
+                    .map(Hit::source)
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error executing Elasticsearch query", e);
+            throw new GeneralException(e.getMessage());
+        }
     }
 }
